@@ -4,6 +4,7 @@ def relu(z):
 	"""ReLu activation function: keep the positive values and zero out the negative ones"""
 	return np.maximum(0, z)
 
+
 def softmax(z):
 	"""Convert the network output scores into probabilities
 
@@ -24,6 +25,26 @@ def softmax(z):
 	probabilities = exp_values / np.sum(exp_values, axis=1, keepdims=True)
 
 	return probabilities
+
+
+def one_hot(y, num_classes=10):
+	"""Turn the labels like [3, 0] into rows with a 1 in the right column
+
+	[3, 0] -> 	[[0,0,0,1,0,0,0,0,0,0],
+				 [1,0,0,0,0,0,0,0,0,0]]			
+	"""
+	encoded = np.zeros((y.size, num_classes))
+	encoded[np.arange(y.size), y] = 1.0
+	return encoded
+
+
+def cross_entropy_loss(probs, y_onehot):
+	"""Average cross entropy loss over a batch
+
+	Work out how wrong the prediction is if it is wrong"""
+	n = probs.shape[0]
+	clipped = np.clip(probs, 1e-12, 1.0)
+	return -np.sum(y_onehot * np.log(clipped)) / n
 
 
 class NeuralNetwork:
@@ -60,7 +81,7 @@ class NeuralNetwork:
 		"""
 		Run the input data through the neural network.
 
-		For NMIST
+		For MNIST
 
 		X
 		784 pixel values
@@ -69,7 +90,7 @@ class NeuralNetwork:
 		128 neurons
 			|
 		Output layer
-		10 letter classes
+		10 digit classes
 			|
 		Probabilities
 		"""
