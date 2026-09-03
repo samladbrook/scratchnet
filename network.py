@@ -114,6 +114,59 @@ class NeuralNetwork:
 		# return the final probabilities
 		return self.a2
 
+	def backward(self, X, y_true):
+		"""
+		Walk backwards through the network to measure how much each weight
+		and bias contributed to the loss (the gradient)
+
+		foward went: 	X -> z1 -> a1 -> z2 -> a2 -> loss
+		backwards goes:	loss -> a2 -> z2 -> a1 -> z1 -> X
+		(we find the gradient at each step)
+
+		X 		784 pixel values we just ran forward
+		y_true 	the one hot correct answers
+		"""
+		# How many images are in the batch
+		n = X.shape[0]
+
+		# -----------------------
+		# Output layer gradients
+		# softmax + cross entropy make this the error
+		# dividing by n turns the total error into the average
+		dz2 = (self.a2 - y_true) / n
+
+		# how each hidden -> output weight affected the loss
+		self.dW2 = self.a1.T @ dz2
+		# how each output bias affected the loss
+		self.db2 = np.sum(dz2, axis=0)
+
+		# -----------------------
+		# Hidden layer gradients
+		# push the error back across W2 to make sure we reach the hidden neurons
+		da1 = dz2 @ self.W2.T
+		# a hidden neuron only passed signal if ReLu let it through
+		# this means the gradient only flows back through those same neurons
+		dz1 = da1 * (self.z1 > 0)
+
+		# how each input -> hidden weight affected the loss
+		self.dW1 = X.T @ dz1
+		# how each hidden bias affected the loss
+		self.db1 = np.sum(dz1, axis=0)
+
+	def update(self, learning_rate):
+		"""
+		Take one step downhill: bump every parametre a little bit
+		in the direction that lowers the loss / gradient
+
+		learning_rate = how big a step to take
+		"""
+		# subtract a fraction of each gradient to move against it
+		self.W1 -= learning_rate * self.dW1
+		self.b1 -= learning_rate * self.db1
+		self.W2 -= learning_rate * self.dW2
+		self.b2 -= learning_rate * self.db2
+
+
 
 
 
