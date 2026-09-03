@@ -46,6 +46,18 @@ def cross_entropy_loss(probs, y_onehot):
 	clipped = np.clip(probs, 1e-12, 1.0)
 	return -np.sum(y_onehot * np.log(clipped)) / n
 
+def accuracy(probs, y_true):
+	"""
+	Fraction of predictions the network got right
+
+	probs 	probabilities from forward()
+	y_true 	the right digit labels
+	"""
+	# the networks guess is whichever class has the highest probability
+	predictions = probs.argmax(axis=1)
+	# compare all guesses to the truth and average
+	return np.mean(predictions == y_true)
+
 
 class NeuralNetwork:
 	def __init__(self, input_size=784, hidden_size=128, output_size=10, seed=0):
