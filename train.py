@@ -9,6 +9,20 @@ EPOCHS = 10             # how many passes over the training data
 BATCH_SIZE = 64         # how many images per step
 LEARNING_RATE = 0.1     # how big each backward step is
 
+def render_digit(image):
+    """
+    Print one MNIST image to the terminal
+    """
+    # AI generated way to visualise images in terminal
+    shades = " .:-=+*#%@"
+    grid = image.reshape(28, 28)
+    for row in grid:
+        line = ""
+        for pixel in row:
+            index = int(pixel * (len(shades)-1))
+            line += shades[index] *2
+        print(line)
+
 # -----------------------
 # load the data and build the network
 X_train, y_train, X_test, y_test = load_mnist()
@@ -75,3 +89,20 @@ print("      " + "".join(f"{d:5d}" for d in range(10)))
 for true_digit in range(10):
     row = "".join(f"{count:5d}" for count in cm[true_digit])
     print(f"  {true_digit}: {row}")
+
+# -----------------------
+# save the trained model so future runs can skip the training
+net.save("scratchnet_model.npz")
+print("\nsaved trained model to scratchnet_model.npz")
+
+# -----------------------
+# find all positions where the guess didnt match
+wrong = np.where(predictions != y_test)[0]
+print(f"3 of the {len(wrong)} mistakes that were made:\n")
+for i in wrong[:3]:
+    print(f"true digit: {y_test[i]}     network guessed: {predictions[i]}")
+    render_digit(X_test[i])
+    print()
+
+
+

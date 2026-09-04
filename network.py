@@ -144,6 +144,14 @@ class NeuralNetwork:
 		# return the final probabilities
 		return self.a2
 
+	def predict(self, X):
+		"""
+		Return the best digit guess for each image
+		"""
+		# run the forward pass and take the highest prob
+		probs = self.forward(X)
+		return probs.argmax(axis=1)
+
 	def backward(self, X, y_true):
 		"""
 		Walk backwards through the network to measure how much each weight
@@ -196,8 +204,24 @@ class NeuralNetwork:
 		self.W2 -= learning_rate * self.dW2
 		self.b2 -= learning_rate * self.db2
 
+	def save(self, path):
+		"""
+		Save the learned weights and biases to a file
+		"""
+		# store each parametre under a name that is easy to look up later
+		np.savez(path, W1=self.W1, b1=self.b1, W2=self.W2, b2=self.b2)
 
-
+	def load(self, path):
+		"""
+		Load weights and biases from a saved npz file
+		replacing what the network holds currently
+		"""
+		# open the file and copy each array back into place
+		data = np.load(path)
+		self.W1 = data["W1"]
+		self.b1 = data["b1"]
+		self.W2 = data["W2"]
+		self.b2 = data["b2"]
 
 
 
