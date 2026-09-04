@@ -58,6 +58,24 @@ def accuracy(probs, y_true):
 	# compare all guesses to the truth and average
 	return np.mean(predictions == y_true)
 
+def confusion_matrix(y_true, y_pred, num_classes=10):
+	"""
+	Count how often each true digit was predicted as each digit
+
+	rows = the actual digit
+	cols = the predicted digit
+
+	the diagonal is the correct guesses
+
+	y_true	the correct labels
+	y_pred	the predicted labels
+	"""
+	# start with a 10x10 matrix of zeros
+	matrix = np.zeros((num_classes, num_classes), dtype=int)
+	# for every (true, predicted) pair we add one to the matching cell
+	np.add.at(matrix, (y_true, y_pred), 1)
+	return matrix
+
 
 class NeuralNetwork:
 	def __init__(self, input_size=784, hidden_size=128, output_size=10, seed=0):
