@@ -11,7 +11,7 @@ import numpy as np
 from data import load_mnist
 from network import NeuralNetwork, one_hot, cross_entropy_loss, accuracy
 import report
-
+import os
 
 def train(net, X_train, y_train, epochs, batch_size, learning_rate, verbose=True):
     """
@@ -89,10 +89,15 @@ def main():
     parser.add_argument("--show-hls-graph", action="store_true", help="train accross multiple hidden layer sizes and graph accuracy vs size (TAKES A MOMENT)")
     parser.add_argument("--show-full-stats", action="store_true", help="print the per digit accuracy and the confusion matrix")
     parser.add_argument("--show-missed-digits", action="store_true", help="draw a few misclassified test digits")
+    parser.add_argument("--save-graphs", action="store_true", help="save graphs to the images/ folder instead of opening them in window")
     parser.add_argument("--save", metavar="PATH", help="save the trained model to PATH (.npz)")
     parser.add_argument("--load", metavar="PATH", help="load a trained model from PATH and skip the training")
     parser.add_argument("--shush", action="store_true", help="hide the per epoch training progress")
     args = parser.parse_args()
+
+    # make the images folder for the graphs
+    if args.save_graphs:
+        os.makedirs("images", exist_ok=True)
 
     # -----------------------
     # load the data and build a fresh network
@@ -101,9 +106,10 @@ def main():
     # -----------------------
     # hidden layer size experiment: a test to investigate hidden layer size vs accuracy
     if args.show_hls_graph:
-        sizes = [16, 32, 64, 128, 256, 512]
+        sizes = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
         sizes, accuracies = hidden_layer_sweep(X_train, y_train, X_test, y_test, sizes=sizes, epochs=args.epochs, batch_size=args.batch_size, learning_rate=args.lr)
-        report.plot_hidden_layer_sweep(sizes, accuracies)
+        path = "images/accuracy_vs_hidden_size.png" if args.save_graphs else None
+        report.plot_hidden_layer_sweep(sizes, accuracies, save_path=path)
         return
 
     # -----------------------
@@ -117,7 +123,8 @@ def main():
         # optional lr graph first
         if args.show_lr_graph:
             learning_rates, losses = net.lr_range_test(X_train, y_train)
-            report.plot_lr_range_test(learning_rates, losses)
+            path = "images/lr_range_test.png" if args.save_graphs else None
+            report.plot_lr_range_test(learning_rates, losses, save_path=path)
         # train the fresh network
         train(net, X_train, y_train,
             epochs=args.epochs, batch_size=args.batch_size,
