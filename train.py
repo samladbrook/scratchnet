@@ -1,7 +1,7 @@
 import numpy as np
 from data import load_mnist
 from network import NeuralNetwork, one_hot, cross_entropy_loss, accuracy, confusion_matrix
-
+import matplotlib.pyplot as plt
 
 # -----------------------
 # training settings
@@ -23,13 +23,31 @@ def render_digit(image):
             line += shades[index] *2
         print(line)
 
+def plot_lr_range_test(learning_rates, losses):
+    """
+    Graph loss vs learning rate from the lr range test method
+    """
+    # draw the curve
+    plt.plot(learning_rates, losses)
+    # need to log scale to spread exponential out
+    plt.xscale("log")
+    plt.xlabel("learning rate")
+    plt.ylabel("loss")
+    plt.title("scrathnet learning rate range test")
+    plt.grid(True)
+    plt.show()
+
 # -----------------------
 # load the data and build the network
 X_train, y_train, X_test, y_test = load_mnist()
 net = NeuralNetwork()
-
 # number of training images
 num_samples = len(X_train)
+
+# -----------------------
+# find a good learning rate
+learning_rates, losses = net.lr_range_test(X_train, y_train)
+plot_lr_range_test(learning_rates, losses)
 
 # -----------------------
 # training loop

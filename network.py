@@ -223,5 +223,56 @@ class NeuralNetwork:
 		self.W2 = data["W2"]
 		self.b2 = data["b2"]
 
+	def lr_range_test(self, X, y, lr_min=1e-4, lr_max=1.0, batch_size=64):
+		"""
+		Method to find the most optimised learning rate by going from tiny
+		to large across a run of smaller batches and recording the loss at each step.
 
+		X, y 		training images and their labels
+		lr_min/max 	the range of learning rates
+		"""
+		# save tje current weights so this test leaves the network
+		saved = {"W1": self.W1.copy(), "b1": self.b1.copy(),
+				"W2": self.W2.copy(), "b2": self.b2.copy()}
 
+		# take one learning step per batch
+		n_batches = X.shape[0] // batch_size
+		# get the factor that grows lr
+		growth = (lr_max / lr_min) ** (1 / n_batches)
+
+		learning_rates = []
+		losses = []
+		lr = lr_min
+		best_loss = np.inf
+
+		for i in range(n_batches):
+			# get the next batch
+			start = i*batch_size
+			X_batch = X[start:start + batch_size]
+			y_batch = y[start:start + batch_size]
+
+			# the usual steps
+			probs = self.forward(X_batch)
+			loss = cross_entropy_loss(probs, one_hot(y_batch))
+			self.backward(X_batch, one_hot(y_batch))
+			self.update(lr)
+
+			# record the values
+			learning_rates.append(lr)
+			losses.append(loss)
+
+			# break when the loss gets big
+			if not np.isfinite(loss) or loss > 4 * best_loss:
+				break
+			if loss < best_loss:
+				best_loss = loss
+
+			lr*=growth
+
+		# put the original weights back
+		self.W1 = saved["W1"]
+		self.b1 = saved["b1"]
+		self.W2 = saved["W2"]
+		self.b2 = saved["b2"]
+
+		return learning_rates, losses
