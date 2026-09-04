@@ -73,3 +73,17 @@ def show_missed_digits(net, X_test, y_test, count=3):
 	    print(f"true digit: {y_test[i]}     network guessed: {predictions[i]}")
 	    render_digit(X_test[i])
 	    print()
+
+def plot_hidden_layer_sweep(sizes, accuracies):
+	"""
+	Graph the test accuracy against the hidden layer size
+	"""
+	percents = [a * 100 for a in accuracies]
+	# marker="o" puts a dot on each size
+	plt.plot(sizes, percents, marker="o")
+	plt.xscale("log", base=2)
+	plt.xlabel("hidden layer size (neurons)")
+	plt.ylabel("test accuracy (%)")
+	plt.title("scratchnet accuracy vs hidden layer size")
+	plt.grid(True)
+	plt.show()
