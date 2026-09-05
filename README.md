@@ -147,7 +147,7 @@ The image is converted to grayscale, resized to 28x28 and then normalised to mat
 For the best result give it a resonably clean and centred digit with some black space around it.
 
 Below in the example result from running the command above:
-![example-prediction-result](./images/example_prediction_result)
+![example-prediction-result](./images/example_prediction_result.png)
 
 
 ## How it learns
