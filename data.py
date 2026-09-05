@@ -1,7 +1,7 @@
 import gzip
 import os
 import urllib.request
-
+from PIL import Image
 import numpy as np
 
 # get the data
@@ -57,3 +57,25 @@ def load_mnist(data_dir="data"):
     X_test = read_images(paths["test_images"]).astype(np.float32) / 255.0
     y_test = read_labels(paths["test_labels"])
     return X_train, y_train, X_test, y_test
+
+def load_image(path):
+    """
+    Load an image file of a daigit and turn it into the exact form the network expects
+
+    MNIST digits are white on black, a photo is usually the other way round so we
+    invert it when the background is bright
+    """
+    # open the image and force it to grayscale
+    img = Image.open(path).convert("L")
+    # shrink it to the 28x28
+    img = img.resize((28, 28))
+    # then to a float array
+    arr = np.array(img, dtype=np.float32) / 255.0
+    # invert it if the background is bright
+    if arr.mean() > 0.5:
+        arr = 1.0-arr
+    # flatten itno the correct shape
+    return arr.reshape(784)
+
+
+
