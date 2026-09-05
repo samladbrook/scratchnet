@@ -8,7 +8,7 @@
 import argparse
 
 import numpy as np
-from data import load_mnist
+from data import load_mnist, load_image
 from network import NeuralNetwork, one_hot, cross_entropy_loss, accuracy
 import report
 import os
@@ -92,6 +92,7 @@ def main():
     parser.add_argument("--save-graphs", action="store_true", help="save graphs to the images/ folder instead of opening them in window")
     parser.add_argument("--save", metavar="PATH", help="save the trained model to PATH (.npz)")
     parser.add_argument("--load", metavar="PATH", help="load a trained model from PATH and skip the training")
+    parser.add_argument("--predict", metavar="PATH", help="load and classify a image file of a digit (png/jpg)")
     parser.add_argument("--shush", action="store_true", help="hide the per epoch training progress")
     args = parser.parse_args()
 
@@ -141,6 +142,18 @@ def main():
         report.print_full_stats(net, X_test, y_test)
     if args.show_missed_digits:
         report.show_missed_digits(net, X_test, y_test)
+
+    # -----------------------
+    # optional classify a image file
+    if args.predict:
+        image = load_image(args.predict)
+        # forward pass on the image
+        probs = net.forward(image.reshape(1, 784))[0]
+        guess = int(probs.argmax())
+        print(f"\nprediction for {args.predict}: {guess}  (confidence {probs[guess]:.1%})")
+        # show what the net really saw
+        print("what the network saw")
+        report.render_digit(image)
 
     # -----------------------
     # optional: save the trained model

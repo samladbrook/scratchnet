@@ -26,6 +26,7 @@ scratchnet/
 ├── report.py         # ASCII digits, plots, and stat tables
 ├── math.pdf          # hnd worked derivations of the network maths
 ├── requirements.txt
+├── nine.jpg		  # example jpg to try predict with
 └── README.md
 ```
 
@@ -102,6 +103,7 @@ python scratchnet.py --help
 | `--show-hls-graph` | Train across several hidden-layer sizes and graph accuracy vs size | off |
 | `--show-full-stats` | Print per-digit accuracy and the confusion matrix | off |
 | `--show-missed-digits` | Draw a few misclassified test digits as ASCII art | off |
+| `--predict PATH` | Classify a image file of a digit (png/jpg) | — |
 | `--save PATH` | Save the trained model to `PATH` (`.npz`) | — |
 | `--load PATH` | Load a trained model and skip training | — |
 | `--save-graphs` | Save graphs to `images/` instead of opening them now | — |
@@ -133,6 +135,16 @@ The learning rate is taken from tiny to large across one run of small batches, r
 ![hls-graph](./images/accuracy_vs_hidden_size.png)
 
 A fresh network is trained at each hidden layer size and its test accuracy plotted. Accuracy climbs steeply at first and then flattens off, you can clearly see the diminishing returns of adding neurons. The dashed line marks the approximate human performance for MNIST (~99.8%). CLosing that final gap takes a bit more then a wider hidden layer (see Possible improvements).
+
+## Classifying your own images
+
+Point the model at an image file of a single hadwritten digit:
+
+`python scratchnet.py --load model.npz --predict nine.jpg`
+
+The image is converted to grayscale, resized to 28x28 and then normalised to match MNIST, which usees white digit on a black background. You get the predicted digit, a confidence score and an ASCII preview of exactly what the network saw.
+
+For the best result give it a resonably clean and centred digit with some black space around it.
 
 ## How it learns
 
